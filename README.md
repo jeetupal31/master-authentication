@@ -9,6 +9,25 @@
 
 ---
 
+## 📸 Screenshots (React frontend)
+
+| Register | Profile |
+|----------|---------|
+| ![Register](frontend/screenshots/register.png) | ![Profile](frontend/screenshots/profile.png) |
+
+A **Vite + React + Tailwind** frontend lives in [`/frontend`](frontend) — register,
+email-verify notice, login, protected profile, and forgot/reset password, all wired
+to this API.
+
+```bash
+cd frontend
+npm install
+cp .env.example .env   # point VITE_API_URL at the backend
+npm run dev            # http://localhost:5173
+```
+
+---
+
 ## ✨ Features
 
 - ✅ **Register** with email + password
