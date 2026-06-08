@@ -5,8 +5,10 @@ import {
   logout,
   registerUser,
   verify,
-} from "../controllers/user.controller.js";
-import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
+  forgotPassword,
+  resetPassword,
+} from "../controllers/use.controller.js";
+import isLoggedIn from "../middleware/isloggedin.js";
 
 const router = express.Router();
 
@@ -15,5 +17,7 @@ router.get("/verify/:token", verify);
 router.post("/login", login);
 router.get("/get-profile", isLoggedIn, getProfile);
 router.post("/logout", isLoggedIn, logout);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 export default router;

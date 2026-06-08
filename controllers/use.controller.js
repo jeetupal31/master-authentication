@@ -289,4 +289,58 @@ const logout = async (req, res) => {
   }
 };
 
-export { registerUser, verify, login, getProfile, logout };
+// Forgot password — send reset link
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ status: false, message: "Email is required" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Return success anyway to avoid email enumeration
+      return res.status(200).json({ status: true, message: "If that email exists, a reset link has been sent" });
+    }
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 min
+    await user.save();
+
+    const resetUrl = `${process.env.BASE_URL}/api/v1/users/reset-password/${token}`;
+    const { sendVerificationEmail: sendEmail } = await import("../utils/sendingMail.utils.js");
+    await sendEmail(user.email, token, resetUrl, "reset");
+
+    return res.status(200).json({ status: true, message: "Password reset link sent to your email" });
+  } catch (error) {
+    console.error("Forgot password failed", error);
+    return res.status(500).json({ status: false, message: "Failed to send reset email" });
+  }
+};
+
+// Reset password with token
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  if (!password || password.length < 6) {
+    return res.status(400).json({ status: false, message: "Password must be at least 6 characters" });
+  }
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordTokenExpiry: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(400).json({ status: false, message: "Invalid or expired reset token" });
+    }
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiry = undefined;
+    await user.save();
+    return res.status(200).json({ status: true, message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Reset password failed", error);
+    return res.status(500).json({ status: false, message: "Password reset failed" });
+  }
+};
+
+export { registerUser, verify, login, getProfile, logout, forgotPassword, resetPassword };

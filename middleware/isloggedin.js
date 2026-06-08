@@ -48,7 +48,7 @@ const isLoggedIn = async(req, res, next) => {
         httpOnly: true,
       };
   
-      res.cookie("aceessToken", newAccessToken, cookieOptions);
+      res.cookie("accessToken", newAccessToken, cookieOptions);
       res.cookie("refreshToken", newRefreshToken, cookieOptions);
       req.user = refreshDecoded;
       next();
@@ -78,7 +78,7 @@ const isLoggedIn = async(req, res, next) => {
         httpOnly: true,
       };
   
-      res.cookie("aceessToken", newAccessToken, cookieOptions);
+      res.cookie("accessToken", newAccessToken, cookieOptions);
       res.cookie("refreshToken", newRefreshToken, cookieOptions);
       req.user = accessDecoded;
       next();
